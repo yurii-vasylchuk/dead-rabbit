@@ -40,7 +40,7 @@ jobs:
       - name: Build
         env:
           VERSION: ${{ github.ref_name }}
-        run: gox -output="target/DeadRabbit-{{.OS}}-{{.Arch}}-{{.Env.VERSION}}" -osarch="darwin/arm64 darwin/amd64 windows/amd64 linux/amd64"
+        run: gox -output="target/DeadRabbit-{{.OS}}-{{.Arch}}-${{ github.ref_name }}" -osarch="darwin/arm64 darwin/amd64 windows/amd64 linux/amd64"
 
       - name: Release
         uses: "marvinpinto/action-automatic-releases@latest"
