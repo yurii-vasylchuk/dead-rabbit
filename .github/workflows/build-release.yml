@@ -1,0 +1,50 @@
+name: Go
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Install GOX
+        run: go install github.com/mitchellh/gox@v1.0.1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Go modules Cache # Docs: <https://git.io/JfAKn#go---modules>
+        uses: actions/cache@v2
+        id: go-cache
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Download go modules
+        if: steps.go-cache.outputs.cache-hit != 'true'
+        run: go mod download
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Build
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: gox -output="target/DeadRabbit-{{.OS}}-{{.Arch}}-{{.Env.VERSION}}" -osarch="darwin/arm64 darwin/amd64 windows/amd64 linux/amd64"
+
+      - name: Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: ${{ endsWith(github.ref_name, 'beta') }}
+          files: target/*

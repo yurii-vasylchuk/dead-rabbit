@@ -1,4 +1,5 @@
 configuration.yaml
 logs.txt
 .idea
-DeadRabbit
+DeadRabbit*
+target/*
