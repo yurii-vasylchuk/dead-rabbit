@@ -4,7 +4,7 @@
 
 Dead rabbit is a tool for investigating RabbitMQ DLQ
 
-Before use, you should prepare configuration file, following below syntax:
+Before use, you should prepare configuration file, following below syntax. Configuration file should be called 'configuration.yaml' and present in the "current" directory, from which you're running DeadRabbit 
 
 ```yaml
 debug: false
