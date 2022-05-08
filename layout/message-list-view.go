@@ -75,5 +75,11 @@ func (m *MessageListView) GetKeyBindings() []*KeyBinding {
 		NewRuneKeyBinding("Drop", false, 'D', func(ev *tcell.EventKey, ctx KeyBindingContext) {
 			ctx.store.Dispatch(state.DropMessage{MessageIdx: ctx.store.GetCurrent().SelectedMessageIdx})
 		}),
+		NewRuneKeyBinding("Requeue", true, 'r', func(ev *tcell.EventKey, ctx KeyBindingContext) {
+			ctx.store.Dispatch(state.RequeueMessage{MessageIdx: ctx.store.GetCurrent().SelectedMessageIdx})
+		}),
+		NewRuneKeyBinding("Requeue", false, 'R', func(ev *tcell.EventKey, ctx KeyBindingContext) {
+			ctx.store.Dispatch(state.RequeueMessage{MessageIdx: ctx.store.GetCurrent().SelectedMessageIdx})
+		}),
 	}
 }

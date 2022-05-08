@@ -107,3 +107,40 @@ func PublishMessagesToDlq(messages []state.MessageStruct, c Configuration) error
 
 	return nil
 }
+
+func PublishMessageToQueue(message state.MessageStruct, c Configuration) error {
+	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/%s",
+		c.User,
+		c.Password,
+		c.Host,
+		c.Port,
+		c.Vhost)
+
+	connection, err := amqp.Dial(connectionString)
+	if err != nil {
+		return err
+	}
+	defer func(connection *amqp.Connection) {
+		err := connection.Close()
+		if err != nil {
+			log.Printf("Can't close a connection, err is %v", err)
+		}
+	}(connection)
+
+	channel, err := connection.Channel()
+	if err != nil {
+		return err
+	}
+	defer func(channel *amqp.Channel) {
+		err := channel.Close()
+		if err != nil {
+			log.Printf("Can't close a channel, err is %v", err)
+		}
+	}(channel)
+
+	return channel.Publish("", c.Queue, true, false, amqp.Publishing{
+		Headers:     message.Headers,
+		ContentType: "application/json",
+		Body:        []byte(message.Body),
+	})
+}

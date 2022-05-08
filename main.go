@@ -45,11 +45,6 @@ type configuration struct {
 	}
 }
 
-type view struct {
-	x, y          int
-	width, height int
-}
-
 func main() {
 	initLogger()
 	err := loadConfiguration()
@@ -137,6 +132,19 @@ func main() {
 				if err := rabbitmq.PublishMessagesToDlq(s.Messages, aConfiguration.Rabbitmq); err != nil {
 					log.Printf("Failed to requeue messages, err: %s", err.Error())
 				}
+			}
+		case state.RequeueMessage:
+			if len(s.Messages) >= action.MessageIdx {
+				log.Printf("Invalid message idx: %d, there is only %d messages loaded", action.MessageIdx, len(s.Messages))
+			}
+
+			if err := rabbitmq.PublishMessageToQueue(s.Messages[action.MessageIdx], aConfiguration.Rabbitmq); err != nil {
+				log.Printf("Failed to requeue message, err: %s", err.Error())
+			}
+
+			s.Messages = append(s.Messages[:action.MessageIdx], s.Messages[action.MessageIdx+1:]...)
+			if s.SelectedMessageIdx >= len(s.Messages) {
+				s.SelectedMessageIdx--
 			}
 		case state.ToggleShowHeaders:
 			s.ShowHeaders = !s.ShowHeaders

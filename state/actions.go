@@ -19,6 +19,10 @@ type FocusNextView struct {
 type RequeueMessages struct {
 }
 
+type RequeueMessage struct {
+	MessageIdx int
+}
+
 type ToggleShowHeaders struct {
 }
 
